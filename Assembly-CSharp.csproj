@@ -62,10 +62,14 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Assets\Script\AirController.cs" />
+    <Compile Include="Assets\Script\GameUIMg.cs" />
+    <Compile Include="Assets\Script\LungCheckMg.cs" />
     <Compile Include="Assets\Script\MemberModify.cs" />
     <Compile Include="Assets\Script\SceneMg.cs" />
     <Compile Include="Assets\Script\ScreenSize.cs" />
     <Compile Include="Assets\Script\Signup.cs" />
+    <Compile Include="Assets\Script\Video.cs" />
     <Reference Include="Unity.Timeline.Editor">
       <HintPath>C:/Users/thdrl/Downloads/finalpj/Library/ScriptAssemblies/Unity.Timeline.Editor.dll</HintPath>
     </Reference>

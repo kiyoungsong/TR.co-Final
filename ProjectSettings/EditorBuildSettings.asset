@@ -17,4 +17,10 @@ EditorBuildSettings:
   - enabled: 1
     path: Assets/Scenes/MemberModify.unity
     guid: 2c7a9d39c4f7f384ba1825a401dab6e8
+  - enabled: 1
+    path: Assets/Scenes/LungCheckScene.unity
+    guid: fffab2d83e083d843b1e04695f14786c
+  - enabled: 1
+    path: Assets/Scenes/LungCheckGuideScene.unity
+    guid: 0cd6519f2536e96479020666dfaea0db
   m_configObjects: {}

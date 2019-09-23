@@ -23,7 +23,7 @@ public class MemberModify : MonoBehaviour
     [SerializeField] private InputField input_address;
     [SerializeField] private InputField input_email;
     
-    SceneMg sceneMg;
+    SceneManger sceneMg;
 
     public string id;                 //수정 x 디비에서 받자
     public string pwd;    
@@ -75,7 +75,7 @@ public class MemberModify : MonoBehaviour
 
     void Start()
     {
-        sceneMg = GameObject.Find("Main Camera").GetComponent<SceneMg>();
+        sceneMg = GameObject.Find("Main Camera").GetComponent<SceneManger>();
     }
 
 

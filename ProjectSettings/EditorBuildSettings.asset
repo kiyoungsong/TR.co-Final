@@ -23,4 +23,10 @@ EditorBuildSettings:
   - enabled: 1
     path: Assets/Scenes/LungCheckGuideScene.unity
     guid: 0cd6519f2536e96479020666dfaea0db
+  - enabled: 1
+    path: Assets/Scenes/ExhaleCheckGuideScene.unity
+    guid: f1e9ea650c2d7474e8dc98edba10aae0
+  - enabled: 1
+    path: Assets/Scenes/ExhaleCheckScene.unity
+    guid: ae42d631260c551419216b2a63e5c61e
   m_configObjects: {}

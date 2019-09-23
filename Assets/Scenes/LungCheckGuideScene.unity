@@ -761,7 +761,7 @@ Light:
   m_BounceIntensity: 1
   m_ColorTemperature: 6570
   m_UseColorTemperature: 0
-  m_BoundingSphereOverride: {x: 0, y: 0, z: 0, w: 0}
+  m_BoundingSphereOverride: {x: 0, y: 0, z: 0, w: 1.89e-43}
   m_UseBoundingSphereOverride: 0
   m_ShadowRadius: 0
   m_ShadowAngle: 0
@@ -1026,7 +1026,7 @@ MonoBehaviour:
   m_GameObject: {fileID: 963194225}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: bb379eb7448a27e4ea9f7ac3157258e5, type: 3}
+  m_Script: {fileID: 11500000, guid: a7d7795d6335e1444a178a4d89d5cd57, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
 --- !u!114 &963194231
@@ -1640,7 +1640,7 @@ GameObject:
   - component: {fileID: 1656537437}
   - component: {fileID: 1656537438}
   m_Layer: 5
-  m_Name: Video Player
+  m_Name: VPlayer
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0

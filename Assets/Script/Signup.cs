@@ -40,7 +40,7 @@ public class Signup : MonoBehaviour
     [SerializeField] private Text text_address;
     [SerializeField] private Text text_email;*/
 
-    SceneMg sceneMg;
+    SceneManger sceneMg;
 
 
     public string id = "0";
@@ -197,7 +197,7 @@ public class Signup : MonoBehaviour
 
     void Start()
     {
-        sceneMg = GameObject.Find("Main Camera").GetComponent<SceneMg>();
+        sceneMg = GameObject.Find("Main Camera").GetComponent<SceneManger>();
         /*input_man = GameObject.Find("GenderMan_btW").GetComponent<Button>();
         input_manblack = GameObject.Find("GenderMan_btB").GetComponent<Button>();
         input_woman = GameObject.Find("GenderWoman_btW").GetComponent<Button>();

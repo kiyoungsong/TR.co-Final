@@ -1,12 +1,12 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using UnityEngine.UI;
 using UnityEngine.Video;
 
 public class Video : MonoBehaviour
 {
     VideoPlayer vp;
+    GameUIMg gameUIMg;
 
     // Start is called before the first frame update
     void Start()
@@ -19,7 +19,7 @@ public class Video : MonoBehaviour
         else
         {
             Debug.LogWarning("vp를 찾을 수 업습니다.");
-        } 
+        }
     }
 
     // Update is called once per frame
@@ -33,10 +33,11 @@ public class Video : MonoBehaviour
         if (vp)
         {
             vp.Play();
+            Debug.Log("동영상 재생 : "+ GameUIMg.guideload);
         }
         else
         {
             Debug.LogWarning("vp에 참조 할 수 없습니다.");
         }
-    }    
+    }
 }

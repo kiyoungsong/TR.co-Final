@@ -17,7 +17,19 @@ public class AirController : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        if(Input.GetKeyDown(KeyCode.UpArrow) == true && gameuimg.pause == false)
+        if(Input.GetKeyDown(KeyCode.UpArrow) == true && gameuimg.pause == false && GameUIMg.whichone == "Exhale")
+        {
+            transform.Translate(Vector3.forward * speed * Time.deltaTime, Space.World);
+            count++;
+        }
+
+        else if (Input.GetKeyDown(KeyCode.UpArrow) == true && gameuimg.pause == false && GameUIMg.whichone == "Inhale")
+        {
+            transform.Translate(-1 * Vector3.forward * speed * Time.deltaTime, Space.World);
+            count--;
+        }
+
+        else if (Input.GetKeyDown(KeyCode.UpArrow) == true && gameuimg.pause == false && GameUIMg.whichone == "Lung")
         {
             transform.Translate(Vector3.forward * speed * Time.deltaTime, Space.World);
             count++;

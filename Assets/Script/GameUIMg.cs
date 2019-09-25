@@ -8,26 +8,30 @@ using System;
 
 public class GameUIMg : MonoBehaviour
 {
-    float countdown = 6.001f; //카운트 다운
-    float checktime = 3.501f; //측정시간
+    public float countdown = 6.001f; //카운트 다운
+    public float checktime = 3.501f; //측정시간
     public static int count = 0;
+    public static int count2 = 0;
     string guide = "";
     [SerializeField] public Text countdown_txt; //카운트 다운 UI
     [SerializeField] public Text guide_txt; //가이드 UI
     [SerializeField] public Text Result_txt; //결과 UI
+    [SerializeField] public Text Score_txt; //실시간 값 UI
+    [SerializeField] public Button Nextcheckbt; //실시간 값 UI
     public bool pause = true; //게임일시 정지 여부
     public static string whichone = ""; //어느 검사인지 체크
     public bool IsInhale = false; //들숨인지 확인 false면 날숨 true면 들숨
     public static float[] mathScore = Enumerable.Repeat<float>(0, 1024).ToArray<float>();
-    static float sco;
+    static float exhaleSco;
+    static float inhaleSco;
+    public static bool guideload = false; //가이드 씬 로드 됬는지 확인
 
     //다른 스크립트 접근
     AirController airController;
     LungCheckMg lungCheckMg;
-
     void Start()
     {
-        if(count <= 2)
+        if(count <= 2 || count2 <= 2)
         {
             pause = true;
         }
@@ -46,6 +50,12 @@ public class GameUIMg : MonoBehaviour
             checktime = 3.501f;
             Debug.Log(checktime);
         }
+        else if(pause == true && whichone == "Inhale")
+        {
+            countdown = 6.001f;
+            checktime = 3.501f;
+            Debug.Log(checktime);
+        }
 
         airController = GameObject.Find("Air").GetComponent<AirController>();
         lungCheckMg = GameObject.Find("Main Camera").GetComponent<LungCheckMg>();
@@ -56,7 +66,6 @@ public class GameUIMg : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        Debug.Log("count :" + count);
         switch (whichone)
         {
             case "Lung":
@@ -85,8 +94,8 @@ public class GameUIMg : MonoBehaviour
                 if (countdown <= 0.0f)
                 {
                     checktime -= Time.deltaTime;
-                    Debug.Log(checktime);
                     pause = false;
+                    ScoreTextUI("현재 수치 :" + airController.count.ToString()); //실시간 값 보여주는 곳
                     mathScore[count]=airController.count;   //횟수 배열에 값넣어줌
                     MaxScore(mathScore);                    //최대값 계산
                     Debug.Log(airController.count); //확인
@@ -98,9 +107,10 @@ public class GameUIMg : MonoBehaviour
                         Time.timeScale = 0.0f; //시간 멈춰주고
                         if(count == 2)
                         {
+                            Nextcheckbt.gameObject.SetActive(true);
                             Result_txt.gameObject.SetActive(true);
-                            ResultTextUI("측정된 최대 값 : " + sco);
-                            Debug.Log("최대값 확인 : " + sco);
+                            ResultTextUI("측정된 최대 값 : " + exhaleSco);
+                            Debug.Log("최대값 확인 : " + exhaleSco);
                         }
                         else
                         {
@@ -112,6 +122,59 @@ public class GameUIMg : MonoBehaviour
                     }
                 }
                 break;
+            case "Inhale": //날숨과 동작은 모두 같음
+                if(guideload == false)
+                {
+                    SceneManager.LoadScene("InhaleCheckGuideScene");
+                }
+                else
+                {
+                    Time.timeScale = 1.0f; //시간 돌게해주고
+                    countdown -= Time.deltaTime;
+                    CountDown(countdown);
+                    Debug.Log(countdown);
+                    Debug.LogWarning(count2);
+                    if (countdown <= 0.0f)
+                    {
+                        Debug.LogWarning("체크1");
+                        checktime -= Time.deltaTime;
+                        pause = false;
+                        ScoreTextUI("현재 수치 :" + airController.count.ToString()); //실시간 값 보여주는 곳
+                        mathScore[count2] = airController.count;   //횟수 배열에 값넣어줌
+                        MinScore(mathScore);                    //최소값 계산(결과는 *-1 해서 양수로 보임)
+                        Debug.Log(airController.count); //확인
+                        GuideTextUI("숨을 최대한 마쉬세요.");
+                        countdown_txt.gameObject.SetActive(false);
+                        Debug.LogWarning("체크2");
+                        if (checktime <= 0.0f) // 3.5초가 지나면
+                        {
+                            Debug.LogWarning("체크3");
+                            pause = true;   //게임 멈추자
+                            Time.timeScale = 0.0f; //시간 멈춰주고
+                            guideload = true;
+                            if (count2 == 2)
+                            {
+                                Debug.LogWarning("체크4");
+                                Result_txt.gameObject.SetActive(true);
+                                ResultTextUI("날숨 수치 : " + exhaleSco + "\n" +
+                                             "들숨 수치 : " + inhaleSco);
+                                Debug.Log("최대값 : " + inhaleSco);
+                            }
+                            else
+                            {
+                                Debug.Log("여기오니");
+                                SceneManager.LoadScene("InhaleCheckScene");
+                                whichone = "Inhale";
+                                count2++;
+                            }
+
+
+                        }
+                    }
+                }
+                
+                break;
+
             default:
                 break;
 
@@ -134,8 +197,13 @@ public class GameUIMg : MonoBehaviour
     {
         Result_txt.text = str;
     }
+
+    void ScoreTextUI(string str)
+    {
+        Score_txt.text = str;
+    }
     
-    void MaxScore(float[] flo)
+    void MaxScore(float[] flo) //최대값 체크 날숨시 (양수)
     {
         float max = float.MinValue;
         for(int i = 0; i < mathScore.Length; i++)
@@ -145,13 +213,20 @@ public class GameUIMg : MonoBehaviour
                 max = mathScore[i];
             }
         }
-        if(IsInhale) //들숨
-        {
-            sco = ((float)Math.Truncate(max * 100.0f) / 100.0f)*-1;
-        }
-        else
-        {
-            sco = (float)Math.Truncate(max * 100.0f) / 100.0f;
-        }
+            exhaleSco = (float)Math.Truncate(max * 100.0f) / 100.0f;
     }
+
+    void MinScore(float[] flo) //최소값 체크 들숨시(음수)
+    {
+        float max = float.MaxValue;
+        for (int i = 0; i < mathScore.Length; i++)
+        {
+            if (max > mathScore[i])
+            {
+                max = mathScore[i];
+            }
+        }
+        inhaleSco = (float)Math.Truncate(max*100.0f)/100.0f;
+    }
+
 }

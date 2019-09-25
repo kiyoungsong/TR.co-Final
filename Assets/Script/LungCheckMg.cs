@@ -15,16 +15,6 @@ public class LungCheckMg : MonoBehaviour
         candles = 0;
     }
 
-    void Start()
-    {
-    }
-
-    // Update is called once per frame
-    void Update()
-    {
-        
-    }
-
     //촛불 통과하면 촛불꺼짐
     void OnTriggerExit(Collider other)
     {

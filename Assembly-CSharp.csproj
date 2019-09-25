@@ -70,6 +70,7 @@
     <Compile Include="Assets\Script\ScreenSize.cs" />
     <Compile Include="Assets\Script\Signup.cs" />
     <Compile Include="Assets\Script\Video.cs" />
+    <None Include="Assets\FreeLabAssets\Shaders\SBS_Mana.shader" />
     <Reference Include="Unity.Timeline.Editor">
       <HintPath>C:/Users/thdrl/Downloads/finalpj/Library/ScriptAssemblies/Unity.Timeline.Editor.dll</HintPath>
     </Reference>

@@ -3,11 +3,15 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using System.Linq;
-
+using UnityEngine.Video;
 public class SceneManger : MonoBehaviour
 {
     GameUIMg gameUI;
-    
+    VideoPlayer vp;
+    private void Start()
+    {
+    }
+
     //로그인 화면으로 씬전환
     public void SceneChangeToLogin()
     {
@@ -48,6 +52,7 @@ public class SceneManger : MonoBehaviour
     public void SceneChangeToExhaleGuideScene()
     {
         SceneManager.LoadScene("ExhaleCheckGuideScene");
+        GameUIMg.whichone = "Exhale";
         GameUIMg.mathScore = Enumerable.Repeat<float>(0, 1024).ToArray<float>();
         GameUIMg.count = 0;
     }
@@ -58,10 +63,12 @@ public class SceneManger : MonoBehaviour
         GameUIMg.whichone = "Exhale";
     }
 
-    public void SceneChangeToInhaleGuidekScene()
+    public void SceneChangeToInhaleGuideScene()
     {
-        SceneManager.LoadScene("InhaleGuideScene");
+        SceneManager.LoadScene("InhaleCheckGuideScene");
         GameUIMg.whichone = "Inhale";
+        GameUIMg.mathScore = Enumerable.Repeat<float>(0, 1024).ToArray<float>();
+        GameUIMg.count2 = 0;
     }
 
     public void SceneChangeToInhaleCheckScene()
@@ -69,4 +76,10 @@ public class SceneManger : MonoBehaviour
         SceneManager.LoadScene("InhaleCheckScene");
         GameUIMg.whichone = "Inhale";
     }
+
+    public void LoadGuide()
+    {
+        GameUIMg.guideload = true;
+    }
+
 }

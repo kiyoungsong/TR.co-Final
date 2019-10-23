@@ -7,7 +7,7 @@ public class AirController : MonoBehaviour
 {
     GameUIMg gameuimg;
     private float speed = 10.0f;
-    public int count = 0; //측정 값
+    public float count = 0.0f; //측정 값
     // Start is called before the first frame update
     void Start()
     {

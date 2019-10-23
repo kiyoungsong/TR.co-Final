@@ -4,7 +4,8 @@ using UnityEngine;
 using UnityEngine.UI;
 using System.IO;
 using System.Text;
-
+using System;
+using UnityEngine.Networking;
 
 public class JsonTest
 {
@@ -18,11 +19,13 @@ public class JsonTest
     public string address;
     public string email;
     public string gender;
+    public string date;
+
     public string SaveToString(object obj)
     {
         return JsonUtility.ToJson(obj);
     }
-    
+
     public void CreateJsonFile(string createPath, string fileName, string jsonData)
     {
         FileStream fileStream = new FileStream(string.Format($"{createPath}/{fileName}.json"), FileMode.Create);
@@ -38,7 +41,7 @@ public class Signup : MonoBehaviour
     [SerializeField] private InputField input_pwd;
     [SerializeField] private InputField input_pwdcheck;
     [SerializeField] private Text pwdcheck_message;
-    [SerializeField] private InputField input_username;   
+    [SerializeField] private InputField input_username;
     [SerializeField] private InputField input_birthday;
     [SerializeField] private Button input_man;
     [SerializeField] private Button input_manblack;
@@ -57,8 +60,7 @@ public class Signup : MonoBehaviour
     [SerializeField] private Button informationB;
 
     SceneManger sceneMg;
-
-
+    DateTime today = DateTime.Now;
     public string id = "0";
     public string pwd = "0";
     public string pwdcheck = "0";
@@ -72,24 +74,37 @@ public class Signup : MonoBehaviour
     public static string condition = "거절";
     public static string information = "거절";
     public static string gender = "남";
+    public static string jsondata; //제이슨 파일 담아 보내는곳
+    string IsSign = "회원가입";
+    string url = "http://thdrldud369.dothome.co.kr/7.php"; //웹서버 도메인
+    //중복확인 버튼 눌르면 동작
+    public void doulbecheck()
+    {
+        IsSign = "중복확인";
+        id = input_id.text;
+        StartCoroutine(SendData(id));
+        GetText();
+    }
 
 
     //회원가입 버튼 눌르면 동작
     public void SignupBtClick()
     {
+        //회원가입 정보가 하나라도 비어 있을경우
         if (string.IsNullOrEmpty(input_id.text) || string.IsNullOrEmpty(input_pwd.text) || string.IsNullOrEmpty(input_pwdcheck.text) || string.IsNullOrEmpty(input_username.text) || string.IsNullOrEmpty(input_birthday.text) ||
        string.IsNullOrEmpty(input_height.text) || string.IsNullOrEmpty(input_weight.text) || string.IsNullOrEmpty(input_phonenum.text) || string.IsNullOrEmpty(input_address.text) || gender == "")
         {
             checkempty.gameObject.SetActive(true);
-            ResetValue();
-            
+            ResetValue(); //입력된 모든 값 초기화
         }
-
+        
+        //이용약관 및 개인정보 수집 이용 동의 체크
         else if (condition == "거절" || information == "거절")
         {
             checkagree.gameObject.SetActive(true);
         }
 
+        //모든값이 다 들어가있으면
         else
         {
             id = input_id.text;
@@ -120,17 +135,16 @@ public class Signup : MonoBehaviour
                 json.address = input_address.text;
                 json.email = input_email.text;
                 json.gender = gender;
-                json.SaveToString(json);
-                string a = json.SaveToString(json);
-                Debug.Log(json.SaveToString(json));
-                json.CreateJsonFile(Application.dataPath, "SignupData", a);
+                json.date = string.Format("{0:u}", today);
+                json.SaveToString(json); //json형식으로 변환
+                jsondata = json.SaveToString(json);
+                StartCoroutine(SendData(jsondata)); //웹서버로 데이터 전송
                 pwdcheck_message.gameObject.SetActive(false);
-                sceneMg.SceneChangeToLogin();
+                StartCoroutine(Waitfortime());
             }
-            Debug.Log("끝");
         }
     }
-    
+
     //모든값 초기화 함수
     public void ResetValue()
     {
@@ -138,7 +152,7 @@ public class Signup : MonoBehaviour
         pwd = "0";
         pwdcheck = "0";
         username = "0";
-        birthday = "0";        
+        birthday = "0";
         height = "0";
         weight = "0";
         phonenum = "0";
@@ -165,8 +179,8 @@ public class Signup : MonoBehaviour
         conditionB.gameObject.SetActive(false);
         informationB.gameObject.SetActive(false);
         informationW.gameObject.SetActive(true);
+        IsSign = "회원가입";
     }
-
 
     public void CheckEmpty()
     {
@@ -234,13 +248,85 @@ public class Signup : MonoBehaviour
     {
         sceneMg = GameObject.Find("Main Camera").GetComponent<SceneManger>();
         ResetValue();
+        GetText();
     }
 
-    void Update()
+    public IEnumerator GetText() //값 받아오는 부분
     {
+        url = "";
+        using (UnityWebRequest www = UnityWebRequest.Get(url))
+        {
+            yield return www.SendWebRequest(); //연결될때까지 기다리고 실행
 
+            if (www.isNetworkError || www.isHttpError)
+            {
+                Debug.Log(www.error);
+            }
+            else
+            {
+                string response = Encoding.UTF8.GetString(www.downloadHandler.data);
+                string s = JsonUtility.FromJson<string>(response);
+                Debug.Log(www.downloadHandler.text);
+            }
+        }
     }
-    
+
+    public IEnumerator SendData(string a) //값 보내는 부분
+    {
+        UnityWebRequest www;
+        if (IsSign == "회원가입")
+        {
+            www = UnityWebRequest.Get(url + "?sign=" + a); //POST 방식으로 통신
+            yield return www.SendWebRequest(); //연결될때까지 기다리고 실행
+            if (www.isNetworkError || www.isHttpError)
+            {
+                Debug.Log(www.error);
+            }
+            else
+            {
+                Debug.Log("Form upload complete!");
+            }
+            string result = www.downloadHandler.text;
+            Debug.Log(result);
+        }
+        else if(IsSign == "중복확인")
+        {
+            www = UnityWebRequest.Get(url + "?idcheck=" + a); //POST 방식으로 통신
+            yield return www.SendWebRequest(); //연결될때까지 기다리고 실행
+            if (www.isNetworkError || www.isHttpError)
+            {
+                Debug.Log(www.error);
+            }
+            else
+            {
+                Debug.Log("Form upload complete!");
+            }
+            string result = www.downloadHandler.text;
+            Debug.Log(result);
+        }
+
+        else if (IsSign == "결과값")
+        {
+            www = UnityWebRequest.Get(url + "?result=" + a); //POST 방식으로 통신
+            yield return www.SendWebRequest(); //연결될때까지 기다리고 실행
+            if (www.isNetworkError || www.isHttpError)
+            {
+                Debug.Log(www.error);
+            }
+            else
+            {
+                Debug.Log("Form upload complete!");
+            }
+            string result = www.downloadHandler.text;
+            Debug.Log(result);
+        }
+        /*List<IMultipartFormSection> form = new List<IMultipartFormSection>(); //웹폼 생성
+        form.Add(new MultipartFormDataSection("sign", jsondata)); //회원가입 정보 넣는 부분 */
+    }
+
+    IEnumerator Waitfortime()
+    {
+        yield return new WaitForSeconds(0.5f);
+        sceneMg.SceneChangeToLogin();
+    }
 }
-
-

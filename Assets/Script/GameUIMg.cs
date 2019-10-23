@@ -8,6 +8,7 @@ using System;
 
 public class GameUIMg : MonoBehaviour
 {
+    public static string identify; //사용자가 누군지 확인
     public float countdown = 6.001f; //카운트 다운
     public float checktime = 3.501f; //측정시간
     public static int count = 0;
@@ -22,9 +23,11 @@ public class GameUIMg : MonoBehaviour
     public static string whichone = ""; //어느 검사인지 체크
     public bool IsInhale = false; //들숨인지 확인 false면 날숨 true면 들숨
     public static float[] mathScore = Enumerable.Repeat<float>(0, 1024).ToArray<float>();
-    static float exhaleSco;
-    static float inhaleSco;
+    public static float exhaleSco;
+    public static float inhaleSco;
     public static bool guideload = false; //가이드 씬 로드 됬는지 확인
+
+    DateTime today = DateTime.Now;
 
     //다른 스크립트 접근
     AirController airController;
@@ -83,6 +86,15 @@ public class GameUIMg : MonoBehaviour
                         Time.timeScale = 0.0f; //시간 멈춰주고
                         Result_txt.gameObject.SetActive(true);
                         ResultTextUI("수치 : \n" + "꺼진 촛불 : " + LungCheckMg.candles + "개");
+                        //json파일 생성
+                        ResultLungToJson lungToJson = new ResultLungToJson();
+                        lungToJson.candle_count = LungCheckMg.candles.ToString();
+                        lungToJson.Lung_Date = string.Format("{0:u}", today);
+                        lungToJson.SaveToString(lungToJson);
+                        string a = lungToJson.SaveToString(lungToJson);
+                        lungToJson.CreateJsonFile(Application.dataPath, "resultLungcheck", a);
+                        Debug.Log(lungToJson.SaveToString(lungToJson));
+
                     }
                 }
                 else { }
@@ -159,6 +171,15 @@ public class GameUIMg : MonoBehaviour
                                 ResultTextUI("날숨 수치 : " + exhaleSco + "\n" +
                                              "들숨 수치 : " + inhaleSco);
                                 Debug.Log("최대값 : " + inhaleSco);
+                                ResultBreathingToJson json = new ResultBreathingToJson();
+                                json.exhaleScore = exhaleSco.ToString();
+                                json.exhale_Date = string.Format("{0:u}", today);
+                                json.inhaleScore = inhaleSco.ToString();
+                                json.inhale_Date = string.Format("{0:u}", today);
+                                json.SaveToString(json);
+                                string a = json.SaveToString(json);
+                                json.CreateJsonFile(Application.dataPath, "resultbreathingcheck", a);
+                                Debug.Log(json.SaveToString(json));
                             }
                             else
                             {

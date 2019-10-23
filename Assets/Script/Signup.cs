@@ -2,8 +2,35 @@
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
+using System.IO;
+using System.Text;
 
 
+public class JsonTest
+{
+    public string id;
+    public string pwd;
+    public string username;
+    public string birthday;
+    public string height;
+    public string weight;
+    public string phonenum;
+    public string address;
+    public string email;
+    public string gender;
+    public string SaveToString(object obj)
+    {
+        return JsonUtility.ToJson(obj);
+    }
+    
+    public void CreateJsonFile(string createPath, string fileName, string jsonData)
+    {
+        FileStream fileStream = new FileStream(string.Format($"{createPath}/{fileName}.json"), FileMode.Create);
+        byte[] data = Encoding.UTF8.GetBytes(jsonData);
+        fileStream.Write(data, 0, data.Length);
+        fileStream.Close();
+    }
+}
 
 public class Signup : MonoBehaviour
 {
@@ -28,17 +55,6 @@ public class Signup : MonoBehaviour
     [SerializeField] private Button informationW;
     [SerializeField] private Button conditionB;
     [SerializeField] private Button informationB;
-
-    /*[SerializeField] private Text text_id;
-    [SerializeField] private Text text_pwd;
-    [SerializeField] private Text text_pwdcheck;
-    [SerializeField] private Text text_username;
-    [SerializeField] private Text text_birthday;
-    [SerializeField] private Text text_height;
-    [SerializeField] private Text text_weight;
-    [SerializeField] private Text text_phonenum;
-    [SerializeField] private Text text_address;
-    [SerializeField] private Text text_email;*/
 
     SceneManger sceneMg;
 
@@ -93,10 +109,25 @@ public class Signup : MonoBehaviour
             }
             else
             {
+                JsonTest json = new JsonTest();
+                json.id = input_id.text;
+                json.pwd = input_pwd.text;
+                json.username = input_username.text;
+                json.birthday = input_birthday.text;
+                json.height = input_height.text;
+                json.weight = input_weight.text;
+                json.phonenum = input_phonenum.text;
+                json.address = input_address.text;
+                json.email = input_email.text;
+                json.gender = gender;
+                json.SaveToString(json);
+                string a = json.SaveToString(json);
+                Debug.Log(json.SaveToString(json));
+                json.CreateJsonFile(Application.dataPath, "SignupData", a);
                 pwdcheck_message.gameObject.SetActive(false);
                 sceneMg.SceneChangeToLogin();
             }
-
+            Debug.Log("끝");
         }
     }
     
@@ -130,6 +161,10 @@ public class Signup : MonoBehaviour
         input_man.gameObject.SetActive(false);
         input_womanblack.gameObject.SetActive(false);
         input_woman.gameObject.SetActive(true);
+        conditionW.gameObject.SetActive(true);
+        conditionB.gameObject.SetActive(false);
+        informationB.gameObject.SetActive(false);
+        informationW.gameObject.SetActive(true);
     }
 
 
@@ -198,20 +233,14 @@ public class Signup : MonoBehaviour
     void Start()
     {
         sceneMg = GameObject.Find("Main Camera").GetComponent<SceneManger>();
-        /*input_man = GameObject.Find("GenderMan_btW").GetComponent<Button>();
-        input_manblack = GameObject.Find("GenderMan_btB").GetComponent<Button>();
-        input_woman = GameObject.Find("GenderWoman_btW").GetComponent<Button>();
-        input_womanblack = GameObject.Find("GenderWoman_btB").GetComponent<Button>();*/
-
         ResetValue();
     }
 
-    // Update is called once per frame
     void Update()
     {
-        Debug.Log(id);
-        Debug.Log(pwd);
-        Debug.Log(pwdcheck);
 
     }
+    
 }
+
+

@@ -8,6 +8,7 @@ public class SceneManger : MonoBehaviour
 {
     GameUIMg gameUI;
     VideoPlayer vp;
+    Login login;
     private void Start()
     {
     }
@@ -27,6 +28,7 @@ public class SceneManger : MonoBehaviour
     //메인 화면으로 씬전환
     public void SceneChangeToMain()
     {
+        //login.TrytoLogin();
         SceneManager.LoadScene("MainScene");
     }
 

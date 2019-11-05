@@ -40,6 +40,7 @@ public class Signup : MonoBehaviour
     [SerializeField] private InputField input_id;
     [SerializeField] private InputField input_pwd;
     [SerializeField] private InputField input_pwdcheck;
+    [SerializeField] private Text idcheck_message;
     [SerializeField] private Text pwdcheck_message;
     [SerializeField] private InputField input_username;
     [SerializeField] private InputField input_birthday;
@@ -58,6 +59,9 @@ public class Signup : MonoBehaviour
     [SerializeField] private Button informationW;
     [SerializeField] private Button conditionB;
     [SerializeField] private Button informationB;
+    [SerializeField] private Button overlapcheck_bt;
+    [SerializeField] private Button overlapcheck_bt2;
+
 
     SceneManger sceneMg;
     DateTime today = DateTime.Now;
@@ -75,8 +79,10 @@ public class Signup : MonoBehaviour
     public static string information = "거절";
     public static string gender = "남";
     public static string jsondata; //제이슨 파일 담아 보내는곳
-    string IsSign = "회원가입";
-    string url = "http://thdrldud369.dothome.co.kr/7.php"; //웹서버 도메인
+    public static string IsSign = "회원가입";
+    public static string url = "http://thdrldud369.dothome.co.kr/7.php"; //웹서버 도메인 여기만 바꾸면 다바뀔거임
+
+    bool doublecheckresult; //중복여부 확인하는 bool값
     //중복확인 버튼 눌르면 동작
     public void doulbecheck()
     {
@@ -85,11 +91,18 @@ public class Signup : MonoBehaviour
         StartCoroutine(SendData(id));
         GetText();
     }
+    
+    //주소검색 누르면 나오는 이벤트
+    public void searchAddress()
+    {
+       //여기에 API넣으셈
+    }
 
 
     //회원가입 버튼 눌르면 동작
     public void SignupBtClick()
     {
+        IsSign = "회원가입";
         //회원가입 정보가 하나라도 비어 있을경우
         if (string.IsNullOrEmpty(input_id.text) || string.IsNullOrEmpty(input_pwd.text) || string.IsNullOrEmpty(input_pwdcheck.text) || string.IsNullOrEmpty(input_username.text) || string.IsNullOrEmpty(input_birthday.text) ||
        string.IsNullOrEmpty(input_height.text) || string.IsNullOrEmpty(input_weight.text) || string.IsNullOrEmpty(input_phonenum.text) || string.IsNullOrEmpty(input_address.text) || gender == "")
@@ -107,7 +120,8 @@ public class Signup : MonoBehaviour
         //모든값이 다 들어가있으면
         else
         {
-            id = input_id.text;
+            //입력된 값을 각 변수에 저장
+            id = input_id.text; 
             pwd = input_pwd.text;
             pwdcheck = input_pwdcheck.text;
             username = input_username.text;
@@ -124,6 +138,7 @@ public class Signup : MonoBehaviour
             }
             else
             {
+                //회원가입시 입력된 값을 json으로 변환하고 웹서버로 데이터 전송하는 부분
                 JsonTest json = new JsonTest();
                 json.id = input_id.text;
                 json.pwd = input_pwd.text;
@@ -253,7 +268,6 @@ public class Signup : MonoBehaviour
 
     public IEnumerator GetText() //값 받아오는 부분
     {
-        url = "";
         using (UnityWebRequest www = UnityWebRequest.Get(url))
         {
             yield return www.SendWebRequest(); //연결될때까지 기다리고 실행
@@ -276,7 +290,7 @@ public class Signup : MonoBehaviour
         UnityWebRequest www;
         if (IsSign == "회원가입")
         {
-            www = UnityWebRequest.Get(url + "?sign=" + a); //POST 방식으로 통신
+            www = UnityWebRequest.Get(url + "?sign=" + a); //GET 방식으로 통신
             yield return www.SendWebRequest(); //연결될때까지 기다리고 실행
             if (www.isNetworkError || www.isHttpError)
             {
@@ -286,12 +300,38 @@ public class Signup : MonoBehaviour
             {
                 Debug.Log("Form upload complete!");
             }
-            string result = www.downloadHandler.text;
+            string result = www.downloadHandler.text;   //받은 값 확인하는 부분
             Debug.Log(result);
         }
         else if(IsSign == "중복확인")
         {
-            www = UnityWebRequest.Get(url + "?idcheck=" + a); //POST 방식으로 통신
+            www = UnityWebRequest.Get(url + "?idcheck=" + a); //GET 방식으로 통신
+            yield return www.SendWebRequest(); //연결될때까지 기다리고 실행
+            if (www.isNetworkError || www.isHttpError)
+            {
+                Debug.Log(www.error);
+            }
+            else
+            {
+                Debug.Log("Form upload complete!");
+            }
+            //중복 이벤트 부분
+            switch (doublecheckresult)
+            {
+                case true: //중복이면
+                    idcheck_message.gameObject.SetActive(true);
+                    break;
+                case false: //중복이 아니면
+                    idcheck_message.gameObject.SetActive(false);
+                    overlapcheck_bt.gameObject.SetActive(false);
+                    overlapcheck_bt2.gameObject.SetActive(true);
+                    break;
+            }
+        }
+
+        else if (IsSign == "결과값")
+        {
+            www = UnityWebRequest.Get(url + "?result=" + a); //GET 방식으로 통신
             yield return www.SendWebRequest(); //연결될때까지 기다리고 실행
             if (www.isNetworkError || www.isHttpError)
             {
@@ -305,9 +345,10 @@ public class Signup : MonoBehaviour
             Debug.Log(result);
         }
 
-        else if (IsSign == "결과값")
+        else if (IsSign == "회원정보수정")
         {
-            www = UnityWebRequest.Get(url + "?result=" + a); //POST 방식으로 통신
+            Debug.Log("여기들어오냐?");
+            www = UnityWebRequest.Get(url + "?modify=" + a); //GET 방식으로 통신
             yield return www.SendWebRequest(); //연결될때까지 기다리고 실행
             if (www.isNetworkError || www.isHttpError)
             {

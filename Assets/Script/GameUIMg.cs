@@ -11,23 +11,24 @@ public class GameUIMg : MonoBehaviour
     public static string identify; //사용자가 누군지 확인
     public float countdown = 6.001f; //카운트 다운
     public float checktime = 3.501f; //측정시간
-    public static int count = 0;
-    public static int count2 = 0;
-    string guide = "";
+    public static int count = 0;    //날숨 측정 횟수
+    public static int count2 = 0;   //들숨 측정 횟수
     [SerializeField] public Text countdown_txt; //카운트 다운 UI
     [SerializeField] public Text guide_txt; //가이드 UI
     [SerializeField] public Text Result_txt; //결과 UI
     [SerializeField] public Text Score_txt; //실시간 값 UI
-    [SerializeField] public Button Nextcheckbt; //실시간 값 UI
+    [SerializeField] public Button Nextcheckbt; //다음 버튼 UI
+    [SerializeField] public Text Nextchecktext; //다음검사 텍스트 UI
     public bool pause = true; //게임일시 정지 여부
     public static string whichone = ""; //어느 검사인지 체크
     public bool IsInhale = false; //들숨인지 확인 false면 날숨 true면 들숨
     public static float[] mathScore = Enumerable.Repeat<float>(0, 1024).ToArray<float>();
-    public static float exhaleSco;
-    public static float inhaleSco;
+    public static float exhaleSco;  //최종 날숨 최대값 저장하는 변수
+    public static float inhaleSco;  //최종 들숨 최솟값 저장하는 변수
     public static bool guideload = false; //가이드 씬 로드 됬는지 확인
-
     DateTime today = DateTime.Now;
+    public string lResult; //폐기능 검사 후의 값을 json파일 저장하는 변수
+    public string bResult; //들숨날숨 검사 후의 값을 json파일 저장하는 변수
 
     //다른 스크립트 접근
     AirController airController;
@@ -38,8 +39,7 @@ public class GameUIMg : MonoBehaviour
         {
             pause = true;
         }
-        Debug.Log("시작");
-        Debug.Log(pause);
+
         Time.timeScale = 1.0f; //시간 돌게해주고
         if (pause == true && whichone == "Lung")//일시정지일때 확인
         {
@@ -68,9 +68,11 @@ public class GameUIMg : MonoBehaviour
 
     // Update is called once per frame
     void Update()
-    {
+    {   
+        //측정하는 부분
         switch (whichone)
         {
+            //폐기능검사
             case "Lung":
                 countdown -= Time.deltaTime;
                 CountDown(countdown);
@@ -85,21 +87,19 @@ public class GameUIMg : MonoBehaviour
                         pause = true;       //게임 멈추자 (더이상 안불리게 즉 값 안들어오게)
                         Time.timeScale = 0.0f; //시간 멈춰주고
                         Result_txt.gameObject.SetActive(true);
-                        ResultTextUI("수치 : \n" + "꺼진 촛불 : " + LungCheckMg.candles + "개");
-                        //json파일 생성
+                        ResultTextUI("수치 : "+ LungCheckMg.Liters +"L\n" + "꺼진 촛불 : " + LungCheckMg.candles + "개");
+                        //json파일 생성 
                         ResultLungToJson lungToJson = new ResultLungToJson();
                         lungToJson.candle_count = LungCheckMg.candles.ToString();
                         lungToJson.Lung_Date = string.Format("{0:u}", today);
                         lungToJson.SaveToString(lungToJson);
-                        string a = lungToJson.SaveToString(lungToJson);
-                        lungToJson.CreateJsonFile(Application.dataPath, "resultLungcheck", a);
-                        Debug.Log(lungToJson.SaveToString(lungToJson));
-
+                        lResult = lungToJson.SaveToString(lungToJson); //폐기능 검사 결과 json파일 저장된 변수
                     }
                 }
                 else { }
                 break;
-            case "Exhale":
+            //날숨검사
+            case "Exhale": 
                 Time.timeScale = 1.0f; //시간 돌게해주고
                 countdown -= Time.deltaTime;
                 CountDown(countdown);
@@ -117,25 +117,26 @@ public class GameUIMg : MonoBehaviour
                     {
                         pause = true;   //게임 멈추자
                         Time.timeScale = 0.0f; //시간 멈춰주고
-                        if(count == 2)
+                        if(count == 2)  //날숨검사 횟수가 2이면 3회 검사 완료
                         {
-                            Nextcheckbt.gameObject.SetActive(true);
-                            Result_txt.gameObject.SetActive(true);
-                            ResultTextUI("측정된 최대 값 : " + exhaleSco);
+                            Nextcheckbt.gameObject.SetActive(true);         //다음 검사로 넘어가는 버튼 활성화
+                            Nextchecktext.gameObject.SetActive(true);
+                            Result_txt.gameObject.SetActive(true);          //결과text창 활성화
+                            ResultTextUI("측정된 최대 값 : " + exhaleSco);    //3회 측정 후 그 중 최대값을 exhaleSco에 저장
                             Debug.Log("최대값 확인 : " + exhaleSco);
                         }
                         else
                         {
                             SceneManager.LoadScene("ExhaleCheckScene");
                             whichone = "Exhale";
-                            count++;
+                            count++;    //검사 끝나면 검사 횟수 올려줌
                         }
                         
                     }
                 }
                 break;
             case "Inhale": //날숨과 동작은 모두 같음
-                if(guideload == false)
+                if(guideload == false)  //가이드영상 보여주는부분
                 {
                     SceneManager.LoadScene("InhaleCheckGuideScene");
                 }
@@ -148,45 +149,39 @@ public class GameUIMg : MonoBehaviour
                     Debug.LogWarning(count2);
                     if (countdown <= 0.0f)
                     {
-                        Debug.LogWarning("체크1");
                         checktime -= Time.deltaTime;
                         pause = false;
-                        ScoreTextUI("현재 수치 :" + airController.count.ToString()); //실시간 값 보여주는 곳
+                        ScoreTextUI("현재 수치 :" + airController.count.ToString()); //블루투스로 넘어오는 데이터출력 보여주는 부분
                         mathScore[count2] = airController.count;   //횟수 배열에 값넣어줌
-                        MinScore(mathScore);                    //최소값 계산(결과는 *-1 해서 양수로 보임)
-                        Debug.Log(airController.count); //확인
+                        MinScore(mathScore);                    //최소값 계산 소숫점 둘째자리 까지 보여줘야된다고 함..
+                        Debug.Log(airController.count); //count값 확인
                         GuideTextUI("숨을 최대한 마쉬세요.");
                         countdown_txt.gameObject.SetActive(false);
-                        Debug.LogWarning("체크2");
                         if (checktime <= 0.0f) // 3.5초가 지나면
                         {
-                            Debug.LogWarning("체크3");
                             pause = true;   //게임 멈추자
                             Time.timeScale = 0.0f; //시간 멈춰주고
-                            guideload = true;
+                            guideload = true;   //가이드 영상 안나오게 하고
                             if (count2 == 2)
                             {
-                                Debug.LogWarning("체크4");
-                                Result_txt.gameObject.SetActive(true);
-                                ResultTextUI("날숨 수치 : " + exhaleSco + "\n" +
-                                             "들숨 수치 : " + inhaleSco);
-                                Debug.Log("최대값 : " + inhaleSco);
+                                Result_txt.gameObject.SetActive(true);          
+                                ResultTextUI("날숨 수치 : " + exhaleSco + "\n" +    //최종 결과값 보여주는 부분
+                                             "들숨 수치 : " + inhaleSco);   
+                                Debug.Log("최대값 : " + inhaleSco); //최대값 확인 콘솔
+                                //결과값 json으로 변환
                                 ResultBreathingToJson json = new ResultBreathingToJson();
                                 json.exhaleScore = exhaleSco.ToString();
                                 json.exhale_Date = string.Format("{0:u}", today);
                                 json.inhaleScore = inhaleSco.ToString();
                                 json.inhale_Date = string.Format("{0:u}", today);
                                 json.SaveToString(json);
-                                string a = json.SaveToString(json);
-                                json.CreateJsonFile(Application.dataPath, "resultbreathingcheck", a);
-                                Debug.Log(json.SaveToString(json));
+                                bResult = json.SaveToString(json);  //json으로 변환된 최종 들숨, 날숨값 넣음
                             }
                             else
                             {
-                                Debug.Log("여기오니");
                                 SceneManager.LoadScene("InhaleCheckScene");
                                 whichone = "Inhale";
-                                count2++;
+                                count2++;   //날숨 횟수 +1
                             }
 
 

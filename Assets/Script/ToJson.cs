@@ -13,14 +13,6 @@ public class ResultLungToJson
     {
         return JsonUtility.ToJson(obj);
     }
-
-    public void CreateJsonFile(string createPath, string fileName, string jsonData)
-    {
-        FileStream fileStream = new FileStream(string.Format($"{createPath}/{fileName}.json"), FileMode.Create);
-        byte[] data = Encoding.UTF8.GetBytes(jsonData);
-        fileStream.Write(data, 0, data.Length);
-        fileStream.Close();
-    }
 }
 
 public class ResultBreathingToJson
@@ -34,31 +26,6 @@ public class ResultBreathingToJson
     {
         return JsonUtility.ToJson(obj);
     }
-
-    public void CreateJsonFile(string createPath, string fileName, string jsonData)
-    {
-        FileStream fileStream = new FileStream(string.Format($"{createPath}/{fileName}.json"), FileMode.Create);
-        byte[] data = Encoding.UTF8.GetBytes(jsonData);
-        fileStream.Write(data, 0, data.Length);
-        fileStream.Close();
-    }
 }
 
-
-
-
-
-public class ToJson : MonoBehaviour
-{
-    // Start is called before the first frame update
-    void Start()
-    {
-        
-    }
-
-    // Update is called once per frame
-    void Update()
-    {
-        
-    }
-}
+public class ToJson : MonoBehaviour{}

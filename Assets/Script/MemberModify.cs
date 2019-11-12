@@ -153,7 +153,7 @@ public class MemberModify : MonoBehaviour
     void Update()
     {
         
-}
+    }
 
     public IEnumerator SendData(string a) //값 보내는 부분
     {

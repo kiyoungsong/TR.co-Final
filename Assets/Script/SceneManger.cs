@@ -9,9 +9,6 @@ public class SceneManger : MonoBehaviour
     GameUIMg gameUI;
     VideoPlayer vp;
     Login login;
-    private void Start()
-    {
-    }
 
     //로그인 화면으로 씬전환
     public void SceneChangeToLogin()
@@ -41,6 +38,7 @@ public class SceneManger : MonoBehaviour
     public void SceneChangeToLungCheckGuideScene()
     {
         SceneManager.LoadScene("LungCheckGuideScene");
+        GameUIMg.whichone = "Lung";
     }
 
     //회원정보 씬전환
@@ -83,5 +81,4 @@ public class SceneManger : MonoBehaviour
     {
         GameUIMg.guideload = true;
     }
-
 }

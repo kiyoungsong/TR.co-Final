@@ -25,14 +25,6 @@ public class JsonTest
     {
         return JsonUtility.ToJson(obj);
     }
-
-    public void CreateJsonFile(string createPath, string fileName, string jsonData)
-    {
-        FileStream fileStream = new FileStream(string.Format($"{createPath}/{fileName}.json"), FileMode.Create);
-        byte[] data = Encoding.UTF8.GetBytes(jsonData);
-        fileStream.Write(data, 0, data.Length);
-        fileStream.Close();
-    }
 }
 
 public class Signup : MonoBehaviour
@@ -61,7 +53,6 @@ public class Signup : MonoBehaviour
     [SerializeField] private Button informationB;
     [SerializeField] private Button overlapcheck_bt;
     [SerializeField] private Button overlapcheck_bt2;
-
 
     SceneManger sceneMg;
     DateTime today = DateTime.Now;
@@ -97,7 +88,6 @@ public class Signup : MonoBehaviour
     {
        //여기에 API넣으셈
     }
-
 
     //회원가입 버튼 눌르면 동작
     public void SignupBtClick()
@@ -345,24 +335,6 @@ public class Signup : MonoBehaviour
             Debug.Log(result);
         }
 
-        else if (IsSign == "회원정보수정")
-        {
-            Debug.Log("여기들어오냐?");
-            www = UnityWebRequest.Get(url + "?modify=" + a); //GET 방식으로 통신
-            yield return www.SendWebRequest(); //연결될때까지 기다리고 실행
-            if (www.isNetworkError || www.isHttpError)
-            {
-                Debug.Log(www.error);
-            }
-            else
-            {
-                Debug.Log("Form upload complete!");
-            }
-            string result = www.downloadHandler.text;
-            Debug.Log(result);
-        }
-        /*List<IMultipartFormSection> form = new List<IMultipartFormSection>(); //웹폼 생성
-        form.Add(new MultipartFormDataSection("sign", jsondata)); //회원가입 정보 넣는 부분 */
     }
 
     IEnumerator Waitfortime()

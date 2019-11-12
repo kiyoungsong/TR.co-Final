@@ -13,5 +13,4 @@ public class MainMenuUI : MonoBehaviour
     {
         username.text = user_name; //로그인된 사용자 이름 보여주는 부분
     }
-
 }

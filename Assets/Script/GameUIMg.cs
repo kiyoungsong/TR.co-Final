@@ -66,7 +66,6 @@ public class GameUIMg : MonoBehaviour
         Debug.Log("어느게임 : "+ whichone);
     }
 
-    // Update is called once per frame
     void Update()
     {   
         //측정하는 부분
@@ -190,10 +189,8 @@ public class GameUIMg : MonoBehaviour
                 }
                 
                 break;
-
             default:
                 break;
-
         }
     }
 
